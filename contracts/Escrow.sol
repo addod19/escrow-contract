@@ -54,12 +54,16 @@ contract Escrow {
     curState = State.AWAITING_DELIVERY;
   }
 
-  function confirmDelivery() {
-
+  function confirmDelivery() onlyBuyer payable public {
+    require(curState == State.AWAITING_DELIVERY, "Cannot confirm delivery");
+    seller.transfer(price);
+    curState = State.COMPLETE;
   }
 
-  function withdraw() {
-
+  function withdraw() onlyBuyer public {
+    require(curState == State.AWAITING_DELIVERY, "Cannot withdraw at this state");
+    payable(msg.sender).transfer(price);
+    curState = State.COMPLETE;
   }
   // 
 }
