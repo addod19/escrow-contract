@@ -34,12 +34,24 @@ contract Escrow {
     price = _price * (1 ether);
   }
 
-  function initContract() {
+  function initContract() escrowNotStarted public {
+    if (msg.sender == buyer) {
+      isBuyerIn = true;
+    }
 
+    if (msg.sender == seller) {
+      isSellerIn = true;
+    }
+
+    if (isBuyerIn && isSellerIn) {
+      curState = State.AWAITING_PAYMENT;
+    }
   }
 
-  function deposit() {
-
+  function deposit() onlyBuyer public payable {
+    require(curState == State.AWAITING_PAYMENT, "Already paid!!");
+    require(msg.value == price, "Wrong deposit amount");
+    curState = State.AWAITING_DELIVERY;
   }
 
   function confirmDelivery() {
